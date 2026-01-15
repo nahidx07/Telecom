@@ -1,61 +1,96 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Admin - Manage Offers</title>
+    <meta charset="UTF-8">
+    <title>Admin Panel - BD Offer</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; background: #f4f4f4; }
-        .form-box { background: white; padding: 20px; border-radius: 10px; max-width: 400px; margin-bottom: 20px; }
-        input, select, button { width: 100%; padding: 10px; margin: 5px 0; }
-        .offer-item { background: white; padding: 10px; margin: 5px 0; display: flex; justify-content: space-between; }
+        body { font-family: sans-serif; background: #f0f2f5; padding: 20px; }
+        .admin-container { max-width: 600px; margin: auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #333; }
+        .input-group { margin-bottom: 15px; }
+        input, select { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        .btn-add { background: #28a745; color: white; }
+        .offer-list { margin-top: 30px; }
+        .offer-item { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 10px; border-bottom: 1px solid #eee; }
+        .btn-del { background: #dc3545; color: white; width: auto; padding: 5px 10px; }
     </style>
 </head>
 <body>
+
+<div class="admin-container">
     <h2>Add New Offer</h2>
-    <div class="form-box">
-        <input type="text" id="title" placeholder="Offer Title (e.g. 10GB 30Day)">
-        <input type="number" id="price" placeholder="Price">
-        <input type="text" id="validity" placeholder="Validity">
-        <select id="operator">
+    <div class="input-group">
+        <input type="text" id="off-title" placeholder="Offer Name (Ex: 10GB + 200Min)">
+    </div>
+    <div class="input-group">
+        <input type="number" id="off-price" placeholder="Price (Ex: 299)">
+    </div>
+    <div class="input-group">
+        <input type="text" id="off-valid" placeholder="Validity (Ex: 30 Days)">
+    </div>
+    <div class="input-group">
+        <select id="off-op">
             <option value="Robi">Robi</option>
             <option value="GP">GP</option>
             <option value="Banglalink">Banglalink</option>
             <option value="Airtel">Airtel</option>
             <option value="Teletalk">Teletalk</option>
         </select>
-        <button onclick="addOffer()" style="background: green; color: white;">Add Offer</button>
     </div>
+    <button class="btn-add" onclick="addOffer()">Publish Offer</button>
 
-    <h2>Current Offers</h2>
-    <div id="admin-offer-list"></div>
+    <div class="offer-list" id="admin-list">
+        <!-- Offers show here -->
+    </div>
+</div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-    <script>
-        const firebaseConfig = { /* আপনার কনফিগ এখানে */ };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+<script>
+    const firebaseConfig = {
+  apiKey: "AIzaSyCbYJQ9y9CJKiT5aJyrIA0pFRGy1uvZikA",
+  authDomain: "telicombangla-1.firebaseapp.com",
+  projectId: "telicombangla-1",
+  storageBucket: "telicombangla-1.firebasestorage.app",
+  messagingSenderId: "1020351520674",
+  appId: "1:1020351520674:web:c84659bc5ca2f6b41edcfb"
+};
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-        function addOffer() {
-            const title = document.getElementById('title').value;
-            const price = document.getElementById('price').value;
-            const validity = document.getElementById('validity').value;
-            const operator = document.getElementById('operator').value;
+    function addOffer() {
+        const title = document.getElementById('off-title').value;
+        const price = document.getElementById('off-price').value;
+        const validity = document.getElementById('off-valid').value;
+        const operator = document.getElementById('off-op').value;
 
-            db.ref('offers').push({ title, price, validity, operator });
-            alert("Added!");
-        }
+        if(!title || !price) return alert('সব তথ্য দিন');
 
-        db.ref('offers').on('value', (snapshot) => {
-            const data = snapshot.val();
-            let html = '';
-            for (let id in data) {
-                html += `<div class="offer-item">${data[id].title} - ${data[id].price}tk 
-                <button onclick="deleteOffer('${id}')" style="width:60px; background:red; color:white;">Delete</button></div>`;
-            }
-            document.getElementById('admin-offer-list').innerHTML = html;
+        db.ref('offers').push({ title, price, validity, operator })
+        .then(() => {
+            alert('সফলভাবে যুক্ত হয়েছে');
+            document.querySelectorAll('input').forEach(i => i.value = '');
         });
+    }
 
-        function deleteOffer(id) { db.ref('offers/' + id).remove(); }
-    </script>
+    db.ref('offers').on('value', (snapshot) => {
+        const data = snapshot.val();
+        let html = '<h3>Current Offers</h3>';
+        for(let id in data) {
+            html += `
+                <div class="offer-item">
+                    <span><b>${data[id].operator}</b>: ${data[id].title} (${data[id].price}tk)</span>
+                    <button class="btn-del" onclick="deleteOffer('${id}')">Delete</button>
+                </div>
+            `;
+        }
+        document.getElementById('admin-list').innerHTML = html;
+    });
+
+    function deleteOffer(id) {
+        if(confirm('মুছে ফেলতে চান?')) db.ref('offers/' + id).remove();
+    }
+</script>
 </body>
 </html>
