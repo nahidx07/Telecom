@@ -3,85 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Premium Operator App</title>
+    <title>BD Offer App</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary-blue: #5865f2; --accent-orange: #ff8c7a; --bg-color: #f8faff; --white: #ffffff; --text-main: #2d3436; --text-muted: #636e72; --robi: #d71921; --gp: #007bc3; --bl: #f48220; --airtel: #ed1c24; --teletalk: #78b833; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-color); overflow-x: hidden; }
-        .app-header { padding: 30px 20px 15px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: var(--bg-color); z-index: 100; }
-        .profile-section-top { display: flex; align-items: center; gap: 12px; }
-        .user-avatar-top { width: 45px; height: 45px; background: #ddd; border-radius: 50%; overflow: hidden; border: 2px solid var(--white); }
-        .user-avatar-top img { width: 100%; height: 100%; object-fit: cover; }
-        .user-info-top h2 { font-size: 14px; font-weight: 700; }
-        .user-info-top p { font-size: 10px; color: var(--text-muted); }
-        #content-view { padding-bottom: 100px; }
-        .balance-section { padding: 5px 20px 15px; }
-        .balance-card { background: var(--white); padding: 18px 22px; border-radius: 22px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 25px rgba(0,0,0,0.03); }
-        .bal-left h3 { font-size: 20px; font-weight: 700; }
-        .add-money-btn { background: var(--primary-blue); color: white; padding: 10px 18px; border-radius: 14px; font-size: 12px; font-weight: 700; cursor: pointer; }
-        .op-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px 15px 20px; }
-        .op-card-mini { background: var(--white); height: 50px; border-radius: 15px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.02); font-size: 11px; font-weight: 700; cursor: pointer; border: 1px solid rgba(0,0,0,0.03); }
-        .op-card-mini.active { background: var(--primary-blue); color: white; border: none; }
-        .offers-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 15px 20px; }
-        .card { background: var(--white); padding: 22px 15px 15px; border-radius: 22px; box-shadow: 0 8px 20px rgba(0,0,0,0.02); position: relative; overflow: hidden; }
-        .op-tag { position: absolute; top: 0; right: 0; padding: 3px 10px; font-size: 8px; font-weight: 800; color: white; border-bottom-left-radius: 12px; text-transform: uppercase; }
-        .tag-robi { background: var(--robi); } .tag-gp { background: var(--gp); } .tag-bl { background: var(--bl); } .tag-airtel { background: var(--airtel); } .tag-teletalk { background: var(--teletalk); }
-        .card-title { font-weight: 700; font-size: 11px; margin-top: 5px; min-height: 32px; }
-        .validity { font-size: 9px; color: var(--text-muted); margin-top: 5px; font-weight: 500; }
-        .price-button { margin-top: 15px; width: 100%; border: none; padding: 10px; border-radius: 12px; background: linear-gradient(135deg, #ff8c7a, #ffb399); color: white; font-weight: 700; font-size: 12px; cursor: pointer; }
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--white); height: 75px; display: flex; justify-content: space-around; align-items: center; border-top-left-radius: 30px; border-top-right-radius: 30px; box-shadow: 0 -5px 30px rgba(0,0,0,0.04); z-index: 1000; }
-        .nav-link { text-decoration: none; display: flex; flex-direction: column; align-items: center; color: #b2bec3; cursor: pointer; }
-        .nav-link i { font-size: 20px; }
-        .nav-link span { font-size: 9px; font-weight: 700; }
-        .nav-link.active { color: var(--accent-orange); }
-        #toast { position: fixed; top: 25px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.85); color: white; padding: 12px 25px; border-radius: 30px; font-size: 12px; z-index: 9999; display: none; }
+        :root { --primary: #5865f2; --bg: #f4f7fe; --white: #ffffff; }
+        * { box-sizing: border-box; font-family: 'Poppins', sans-serif; margin: 0; padding: 0; }
+        body { background: var(--bg); overflow-x: hidden; }
+
+        /* Login Screen */
+        #auth-screen { position: fixed; inset: 0; background: white; z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        .google-btn { background: #df4b38; color: white; border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-weight: 600; }
+
+        /* Header */
+        .app-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; background: var(--white); }
+        
+        /* Dashboard Grid */
+        .home-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 20px; }
+        .grid-item { background: white; padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.03); cursor: pointer; }
+        .grid-item i { font-size: 24px; color: var(--primary); margin-bottom: 8px; }
+        .grid-item span { font-size: 11px; font-weight: 600; display: block; }
+
+        /* Sliding Profile */
+        #profile-slider { 
+            position: fixed; top: 0; right: 0; width: 80%; height: 100%; 
+            background: white; z-index: 1500; transform: translateX(100%);
+            transition: 0.4s; padding: 20px; box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+        }
+        #profile-slider.open { transform: translateX(0); }
+
+        /* Bottom Nav */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: white; display: flex; justify-content: space-around; align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
+        .nav-btn { display: flex; flex-direction: column; align-items: center; color: #888; cursor: pointer; }
+        .nav-btn.active { color: var(--primary); }
+
+        /* Offer Filter Tabs */
+        .filter-tabs { display: flex; overflow-x: auto; padding: 10px 20px; gap: 10px; }
+        .tab { padding: 8px 15px; background: white; border-radius: 20px; font-size: 12px; white-space: nowrap; cursor: pointer; }
+        .tab.active { background: var(--primary); color: white; }
+
+        .hidden { display: none; }
     </style>
 </head>
 <body>
-    <div id="toast">প্রসেসিং...</div>
-    <header class="app-header">
-        <div class="profile-section-top">
-            <div class="user-avatar-top"><img src="https://i.pravatar.cc/150?u=nasir" alt=""></div>
-            <div class="user-info-top"><h2>01300XXXXXX</h2><p>Nasir User</p></div>
-        </div>
-    </header>
 
-    <div id="content-view">
-        <div class="balance-section">
-            <div class="balance-card">
-                <div class="bal-left"><p>ব্যালেন্স</p><h3 id="user-bal">৳ ০.০০</h3></div>
-                <div class="add-money-btn" onclick="alert('অ্যাড মানি অপশন শীঘ্রই আসছে')"><i class="fas fa-plus-circle"></i> Add Money</div>
+    <!-- Auth Screen -->
+    <div id="auth-screen">
+        <h2>Welcome to BD Offer</h2>
+        <p style="margin-bottom: 20px;">লগইন করে শুরু করুন</p>
+        <button class="google-btn" onclick="loginWithGoogle()"><i class="fab fa-google"></i> Login with Google</button>
+    </div>
+
+    <!-- Main App -->
+    <div id="main-app" class="hidden">
+        <header class="app-header">
+            <div class="user-info">
+                <h4 id="user-name">Loading...</h4>
+                <p id="user-balance" style="color: green; font-weight: bold;">৳ 0.00</p>
+            </div>
+            <i class="far fa-bell" style="font-size: 20px;"></i>
+        </header>
+
+        <div id="view-container">
+            <!-- Home View -->
+            <div id="home-view">
+                <div class="home-grid">
+                    <div class="grid-item" onclick="showAddMoney()"><i class="fas fa-wallet"></i><span>Add Money</span></div>
+                    <div class="grid-item"><i class="fas fa-car"></i><span>Drive Offer</span></div>
+                    <div class="grid-item"><i class="fas fa-bolt"></i><span>Recharge</span></div>
+                    <div class="grid-item"><i class="fas fa-globe"></i><span>Internet</span></div>
+                    <div class="grid-item"><i class="fas fa-phone"></i><span>Minute</span></div>
+                    <div class="grid-item"><i class="fas fa-envelope"></i><span>SMS</span></div>
+                </div>
+                <div style="padding: 20px;">
+                    <h3>All Offers</h3>
+                    <div id="all-offers-list"></div>
+                </div>
+            </div>
+
+            <!-- Offers View -->
+            <div id="offers-view" class="hidden">
+                <div class="filter-tabs" id="operator-tabs">
+                    <div class="tab active" onclick="setOp('GP')">GP</div>
+                    <div class="tab" onclick="setOp('Robi')">Robi</div>
+                    <div class="tab" onclick="setOp('Airtel')">Airtel</div>
+                    <div class="tab" onclick="setOp('Banglalink')">BL</div>
+                </div>
+                <div class="filter-tabs" id="cat-tabs">
+                    <div class="tab active" onclick="setCat('Internet')">Internet</div>
+                    <div class="tab" onclick="setCat('Minute')">Minute</div>
+                    <div class="tab" onclick="setCat('Bundle')">Bundle</div>
+                </div>
+                <div id="filtered-offers" style="padding: 20px;"></div>
+            </div>
+
+            <!-- History View -->
+            <div id="history-view" class="hidden" style="padding: 20px;">
+                <h3>Transactions</h3>
+                <div id="history-list"></div>
             </div>
         </div>
 
-        <div class="op-grid-3" id="op-filter">
-            <div class="op-card-mini active" onclick="filterOffers('All', this)">All</div>
-            <div class="op-card-mini" onclick="filterOffers('Robi', this)">Robi</div>
-            <div class="op-card-mini" onclick="filterOffers('GP', this)">GP</div>
-            <div class="op-card-mini" onclick="filterOffers('Banglalink', this)">BL</div>
-            <div class="op-card-mini" onclick="filterOffers('Airtel', this)">Airtel</div>
-            <div class="op-card-mini" onclick="filterOffers('Teletalk', this)">Teletalk</div>
+        <!-- Profile Slider -->
+        <div id="profile-slider">
+            <div style="display: flex; justify-content: space-between;">
+                <h3>Profile Settings</h3>
+                <i class="fas fa-times" onclick="toggleProfile()"></i>
+            </div>
+            <div style="margin-top: 30px;">
+                <p>User ID: <span id="p-id"></span></p>
+                <button onclick="logout()" style="margin-top: 20px; color: red; border: none; background: none;">Logout</button>
+            </div>
         </div>
 
-        <div class="offers-grid" id="offers-list">
-            <!-- ফায়ারবেস থেকে ডাটা আসবে -->
-        </div>
+        <nav class="bottom-nav">
+            <div class="nav-btn active" onclick="switchTab('home')"><i class="fas fa-home"></i><span>Home</span></div>
+            <div class="nav-btn" onclick="switchTab('offers')"><i class="fas fa-gift"></i><span>Offers</span></div>
+            <div class="nav-btn" onclick="switchTab('history')"><i class="fas fa-history"></i><span>History</span></div>
+            <div class="nav-btn" onclick="toggleProfile()"><i class="fas fa-user"></i><span>Account</span></div>
+        </nav>
     </div>
 
-    <nav class="bottom-nav">
-        <a class="nav-link active"><i class="fas fa-home"></i><span>Home</span></a>
-        <a class="nav-link" onclick="alert('Coming Soon')"><i class="fas fa-gift"></i><span>Offers</span></a>
-        <a class="nav-link" onclick="alert('Coming Soon')"><i class="fas fa-history"></i><span>History</span></a>
-        <a class="nav-link" onclick="window.location.href='/admin.html'"><i class="fas fa-user-shield"></i><span>Admin</span></a>
-    </nav>
-
-    <!-- Firebase SDK -->
+    <!-- Firebase Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
     <script>
+        // Firebase Configuration (Replace with your own)
         const firebaseConfig = {
   apiKey: "AIzaSyCbYJQ9y9CJKiT5aJyrIA0pFRGy1uvZikA",
   authDomain: "telicombangla-1.firebaseapp.com",
@@ -91,59 +140,77 @@
   appId: "1:1020351520674:web:c84659bc5ca2f6b41edcfb"
 };
         firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
         const db = firebase.database();
 
-        let allOffers = [];
-
-        // অফার লোড করা
-        function fetchOffers() {
-            db.ref('offers').on('value', (snapshot) => {
-                const data = snapshot.val();
-                allOffers = [];
-                for(let id in data) {
-                    allOffers.push({ id, ...data[id] });
-                }
-                renderOffers(allOffers);
-            });
+        // --- Auth Logic ---
+        function loginWithGoogle() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider);
         }
 
-        function renderOffers(offers) {
-            const container = document.getElementById('offers-list');
-            container.innerHTML = offers.map(off => `
-                <div class="card">
-                    <span class="op-tag tag-${off.operator.toLowerCase()}">${off.operator}</span>
-                    <div class="card-title">${off.title}</div>
-                    <div class="validity">${off.validity}</div>
-                    <button class="price-button" onclick="buyOffer('${off.id}', '${off.title}', '${off.price}', '${off.operator}')">৳ ${off.price}</button>
-                </div>
-            `).join('');
-        }
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('main-app').classList.remove('hidden');
+                document.getElementById('user-name').innerText = user.displayName;
+                document.getElementById('p-id').innerText = user.uid;
+                syncUserData(user.uid);
+            } else {
+                document.getElementById('auth-screen').classList.remove('hidden');
+                document.getElementById('main-app').classList.add('hidden');
+            }
+        });
 
-        function filterOffers(op, el) {
-            document.querySelectorAll('.op-card-mini').forEach(c => c.classList.remove('active'));
-            el.classList.add('active');
-            if(op === 'All') renderOffers(allOffers);
-            else renderOffers(allOffers.filter(o => o.operator === op));
-        }
+        function logout() { auth.signOut(); }
 
-        async function buyOffer(id, title, price, operator) {
-            const phone = prompt(`${title} অফারটি কিনতে আপনার নম্বর দিন:`);
-            if(!phone || phone.length < 11) return alert('সঠিক নম্বর দিন');
-
-            showToast('অর্ডার প্রসেসিং...');
+        // --- UI Logic ---
+        function switchTab(tab) {
+            document.getElementById('home-view').classList.add('hidden');
+            document.getElementById('offers-view').classList.add('hidden');
+            document.getElementById('history-view').classList.add('hidden');
+            document.getElementById(tab + '-view').classList.remove('hidden');
             
-            const res = await fetch('/api/bot', {
-                method: 'POST',
-                body: JSON.stringify({ title, price, phone, operator, type: 'OFFER_PURCHASE' })
-            });
-
-            if(res.ok) alert('অর্ডার সফল হয়েছে! আপনার টেলিগ্রামে মেসেজ পাঠানো হয়েছে।');
-            else alert('অর্ডার ফেইল হয়েছে।');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            event.currentTarget.classList.add('active');
         }
 
-        function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2000); }
+        function toggleProfile() {
+            document.getElementById('profile-slider').classList.toggle('open');
+        }
 
-        fetchOffers();
+        // --- Data Logic ---
+        function syncUserData(uid) {
+            db.ref('users/' + uid).on('value', snap => {
+                const data = snap.val();
+                if (data) {
+                    document.getElementById('user-balance').innerText = '৳ ' + (data.balance || 0);
+                } else {
+                    db.ref('users/' + uid).set({ balance: 0, name: auth.currentUser.displayName });
+                }
+            });
+        }
+
+        // Add Money Logic (Admin's Number Copy)
+        function showAddMoney() {
+            db.ref('settings/paymentNumber').once('value', snap => {
+                const num = snap.val() || "017XXXXXXXX";
+                const trxId = prompt(`টাকা পাঠাতে এই নম্বরে সেন্ড মানি করুন: ${num} (কপি করুন)। পাঠানোর পর Transaction ID দিন:`);
+                if(trxId) {
+                    const sender = prompt("যে নম্বর থেকে টাকা পাঠিয়েছেন সেটি দিন:");
+                    db.ref('addMoneyRequests').push({
+                        uid: auth.currentUser.uid,
+                        trxId,
+                        sender,
+                        status: 'pending',
+                        timestamp: Date.now()
+                    });
+                    alert("রিকোয়েস্ট পাঠানো হয়েছে!");
+                }
+            });
+        }
+
+        // Load Offers... (Functionality for filtering and listing)
     </script>
 </body>
 </html>
