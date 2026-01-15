@@ -2,135 +2,101 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BD Offer App</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User App - Login & Signup</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #5865f2; --bg: #f4f7fe; --white: #ffffff; }
-        * { box-sizing: border-box; font-family: 'Poppins', sans-serif; margin: 0; padding: 0; }
-        body { background: var(--bg); overflow-x: hidden; }
-
-        /* Login Screen */
-        #auth-screen { position: fixed; inset: 0; background: white; z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-        .google-btn { background: #df4b38; color: white; border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-weight: 600; }
-
-        /* Header */
-        .app-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; background: var(--white); }
+        :root { --primary: #5865f2; --bg: #f4f7fe; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; }
         
-        /* Dashboard Grid */
-        .home-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 20px; }
-        .grid-item { background: white; padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.03); cursor: pointer; }
-        .grid-item i { font-size: 24px; color: var(--primary); margin-bottom: 8px; }
-        .grid-item span { font-size: 11px; font-weight: 600; display: block; }
+        /* Auth Screens */
+        .auth-container { max-width: 400px; margin: 50px auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        .auth-container h2 { text-align: center; margin-bottom: 20px; color: #333; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; }
+        .btn-main { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .google-btn { width: 100%; padding: 12px; background: white; border: 1px solid #ddd; margin-top: 10px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .switch-auth { text-align: center; margin-top: 15px; font-size: 14px; color: #666; cursor: pointer; }
 
-        /* Sliding Profile */
+        /* Profile Slider (Right to Left) */
         #profile-slider { 
-            position: fixed; top: 0; right: 0; width: 80%; height: 100%; 
-            background: white; z-index: 1500; transform: translateX(100%);
-            transition: 0.4s; padding: 20px; box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+            position: fixed; top: 0; right: 0; width: 85%; height: 100%; 
+            background: white; z-index: 1000; transform: translateX(100%);
+            transition: 0.4s ease-in-out; padding: 25px; box-shadow: -5px 0 20px rgba(0,0,0,0.1); 
         }
         #profile-slider.open { transform: translateX(0); }
 
-        /* Bottom Nav */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: white; display: flex; justify-content: space-around; align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
-        .nav-btn { display: flex; flex-direction: column; align-items: center; color: #888; cursor: pointer; }
-        .nav-btn.active { color: var(--primary); }
-
-        /* Offer Filter Tabs */
-        .filter-tabs { display: flex; overflow-x: auto; padding: 10px 20px; gap: 10px; }
-        .tab { padding: 8px 15px; background: white; border-radius: 20px; font-size: 12px; white-space: nowrap; cursor: pointer; }
-        .tab.active { background: var(--primary); color: white; }
+        /* Main Dashboard Grid */
+        .grid-menu { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 20px; }
+        .menu-item { background: white; padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+        .menu-item i { font-size: 24px; color: var(--primary); margin-bottom: 8px; }
 
         .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <!-- Auth Screen -->
-    <div id="auth-screen">
-        <h2>Welcome to BD Offer</h2>
-        <p style="margin-bottom: 20px;">লগইন করে শুরু করুন</p>
-        <button class="google-btn" onclick="loginWithGoogle()"><i class="fab fa-google"></i> Login with Google</button>
-    </div>
-
-    <!-- Main App -->
-    <div id="main-app" class="hidden">
-        <header class="app-header">
-            <div class="user-info">
-                <h4 id="user-name">Loading...</h4>
-                <p id="user-balance" style="color: green; font-weight: bold;">৳ 0.00</p>
-            </div>
-            <i class="far fa-bell" style="font-size: 20px;"></i>
-        </header>
-
-        <div id="view-container">
-            <!-- Home View -->
-            <div id="home-view">
-                <div class="home-grid">
-                    <div class="grid-item" onclick="showAddMoney()"><i class="fas fa-wallet"></i><span>Add Money</span></div>
-                    <div class="grid-item"><i class="fas fa-car"></i><span>Drive Offer</span></div>
-                    <div class="grid-item"><i class="fas fa-bolt"></i><span>Recharge</span></div>
-                    <div class="grid-item"><i class="fas fa-globe"></i><span>Internet</span></div>
-                    <div class="grid-item"><i class="fas fa-phone"></i><span>Minute</span></div>
-                    <div class="grid-item"><i class="fas fa-envelope"></i><span>SMS</span></div>
-                </div>
-                <div style="padding: 20px;">
-                    <h3>All Offers</h3>
-                    <div id="all-offers-list"></div>
-                </div>
-            </div>
-
-            <!-- Offers View -->
-            <div id="offers-view" class="hidden">
-                <div class="filter-tabs" id="operator-tabs">
-                    <div class="tab active" onclick="setOp('GP')">GP</div>
-                    <div class="tab" onclick="setOp('Robi')">Robi</div>
-                    <div class="tab" onclick="setOp('Airtel')">Airtel</div>
-                    <div class="tab" onclick="setOp('Banglalink')">BL</div>
-                </div>
-                <div class="filter-tabs" id="cat-tabs">
-                    <div class="tab active" onclick="setCat('Internet')">Internet</div>
-                    <div class="tab" onclick="setCat('Minute')">Minute</div>
-                    <div class="tab" onclick="setCat('Bundle')">Bundle</div>
-                </div>
-                <div id="filtered-offers" style="padding: 20px;"></div>
-            </div>
-
-            <!-- History View -->
-            <div id="history-view" class="hidden" style="padding: 20px;">
-                <h3>Transactions</h3>
-                <div id="history-list"></div>
-            </div>
+    <!-- Auth System -->
+    <div id="auth-section">
+        <div class="auth-container" id="login-box">
+            <h2>লগইন করুন</h2>
+            <input type="email" id="login-email" placeholder="Email">
+            <input type="password" id="login-pass" placeholder="Password">
+            <button class="btn-main" onclick="emailLogin()">লগইন</button>
+            <div class="switch-auth" onclick="toggleAuth()">নতুন একাউন্ট খুলুন</div>
+            <button class="google-btn" onclick="googleLogin()"><img src="https://img.icons8.com/color/24/000000/google-logo.png"/> Google দিয়ে লগইন</button>
         </div>
 
-        <!-- Profile Slider -->
+        <div class="auth-container hidden" id="signup-box">
+            <h2>রেজিস্ট্রেশন করুন</h2>
+            <input type="text" id="reg-name" placeholder="Full Name">
+            <input type="email" id="reg-email" placeholder="Email">
+            <input type="password" id="reg-pass" placeholder="Password">
+            <button class="btn-main" onclick="emailSignup()">একাউন্ট খুলুন</button>
+            <div class="switch-auth" onclick="toggleAuth()">ইতিমধ্যে একাউন্ট আছে? লগইন করুন</div>
+        </div>
+    </div>
+
+    <!-- Main App Content -->
+    <div id="main-app" class="hidden">
+        <div style="padding: 20px; display: flex; justify-content: space-between;">
+            <div><h3>ব্যালেন্স: ৳ <span id="u-bal">0.00</span></h3></div>
+            <i class="far fa-bell" style="font-size: 20px;"></i>
+        </div>
+
+        <div class="grid-menu">
+            <div class="menu-item" onclick="openAddMoney()"><i class="fas fa-wallet"></i><br>Add Money</div>
+            <div class="menu-item"><i class="fas fa-car"></i><br>Drive Offer</div>
+            <div class="menu-item"><i class="fas fa-bolt"></i><br>Recharge</div>
+            <div class="menu-item"><i class="fas fa-globe"></i><br>Internet</div>
+            <div class="menu-item"><i class="fas fa-phone"></i><br>Minute</div>
+            <div class="menu-item"><i class="fas fa-sms"></i><br>SMS</div>
+        </div>
+
         <div id="profile-slider">
-            <div style="display: flex; justify-content: space-between;">
-                <h3>Profile Settings</h3>
+            <div style="display:flex; justify-content: space-between;">
+                <h2>My Account</h2>
                 <i class="fas fa-times" onclick="toggleProfile()"></i>
             </div>
-            <div style="margin-top: 30px;">
-                <p>User ID: <span id="p-id"></span></p>
-                <button onclick="logout()" style="margin-top: 20px; color: red; border: none; background: none;">Logout</button>
-            </div>
+            <hr><br>
+            <p>Name: <span id="p-name">---</span></p>
+            <p>Email: <span id="p-email">---</span></p>
+            <button class="btn-main" style="background: #ff4757; margin-top: 20px;" onclick="logout()">Logout</button>
         </div>
 
-        <nav class="bottom-nav">
-            <div class="nav-btn active" onclick="switchTab('home')"><i class="fas fa-home"></i><span>Home</span></div>
-            <div class="nav-btn" onclick="switchTab('offers')"><i class="fas fa-gift"></i><span>Offers</span></div>
-            <div class="nav-btn" onclick="switchTab('history')"><i class="fas fa-history"></i><span>History</span></div>
-            <div class="nav-btn" onclick="toggleProfile()"><i class="fas fa-user"></i><span>Account</span></div>
-        </nav>
+        <!-- Bottom Nav -->
+        <div style="position: fixed; bottom: 0; width: 100%; height: 70px; background: white; display: flex; justify-content: space-around; align-items: center;">
+            <div onclick="showTab('home')"><i class="fas fa-home"></i><br><small>Home</small></div>
+            <div onclick="showTab('offers')"><i class="fas fa-gift"></i><br><small>Offers</small></div>
+            <div onclick="showTab('history')"><i class="fas fa-history"></i><br><small>History</small></div>
+            <div onclick="toggleProfile()"><i class="fas fa-user"></i><br><small>Account</small></div>
+        </div>
     </div>
 
-    <!-- Firebase Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
     <script>
-        // Firebase Configuration (Replace with your own)
         const firebaseConfig = {
   apiKey: "AIzaSyCbYJQ9y9CJKiT5aJyrIA0pFRGy1uvZikA",
   authDomain: "telicombangla-1.firebaseapp.com",
@@ -143,74 +109,56 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // --- Auth Logic ---
-        function loginWithGoogle() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithPopup(provider);
-        }
-
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('main-app').classList.remove('hidden');
-                document.getElementById('user-name').innerText = user.displayName;
-                document.getElementById('p-id').innerText = user.uid;
-                syncUserData(user.uid);
-            } else {
-                document.getElementById('auth-screen').classList.remove('hidden');
-                document.getElementById('main-app').classList.add('hidden');
-            }
-        });
-
-        function logout() { auth.signOut(); }
-
-        // --- UI Logic ---
-        function switchTab(tab) {
-            document.getElementById('home-view').classList.add('hidden');
-            document.getElementById('offers-view').classList.add('hidden');
-            document.getElementById('history-view').classList.add('hidden');
-            document.getElementById(tab + '-view').classList.remove('hidden');
-            
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            event.currentTarget.classList.add('active');
+        function toggleAuth() {
+            document.getElementById('login-box').classList.toggle('hidden');
+            document.getElementById('signup-box').classList.toggle('hidden');
         }
 
         function toggleProfile() {
             document.getElementById('profile-slider').classList.toggle('open');
         }
 
-        // --- Data Logic ---
-        function syncUserData(uid) {
-            db.ref('users/' + uid).on('value', snap => {
-                const data = snap.val();
-                if (data) {
-                    document.getElementById('user-balance').innerText = '৳ ' + (data.balance || 0);
-                } else {
-                    db.ref('users/' + uid).set({ balance: 0, name: auth.currentUser.displayName });
-                }
+        // Email Signup
+        function emailSignup() {
+            const email = document.getElementById('reg-email').value;
+            const pass = document.getElementById('reg-pass').value;
+            auth.createUserWithEmailAndPassword(email, pass)
+                .then(res => {
+                    db.ref('users/' + res.user.uid).set({ name: document.getElementById('reg-name').value, balance: 0 });
+                }).catch(err => alert(err.message));
+        }
+
+        // Email Login
+        function emailLogin() {
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-pass').value;
+            auth.signInWithEmailAndPassword(email, pass).catch(err => alert(err.message));
+        }
+
+        // Google Login
+        function googleLogin() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider).then(res => {
+                db.ref('users/' + res.user.uid).update({ name: res.user.displayName });
             });
         }
 
-        // Add Money Logic (Admin's Number Copy)
-        function showAddMoney() {
-            db.ref('settings/paymentNumber').once('value', snap => {
-                const num = snap.val() || "017XXXXXXXX";
-                const trxId = prompt(`টাকা পাঠাতে এই নম্বরে সেন্ড মানি করুন: ${num} (কপি করুন)। পাঠানোর পর Transaction ID দিন:`);
-                if(trxId) {
-                    const sender = prompt("যে নম্বর থেকে টাকা পাঠিয়েছেন সেটি দিন:");
-                    db.ref('addMoneyRequests').push({
-                        uid: auth.currentUser.uid,
-                        trxId,
-                        sender,
-                        status: 'pending',
-                        timestamp: Date.now()
-                    });
-                    alert("রিকোয়েস্ট পাঠানো হয়েছে!");
-                }
-            });
-        }
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                document.getElementById('auth-section').classList.add('hidden');
+                document.getElementById('main-app').classList.remove('hidden');
+                db.ref('users/' + user.uid).on('value', snap => {
+                    document.getElementById('u-bal').innerText = snap.val().balance;
+                    document.getElementById('p-name').innerText = snap.val().name;
+                    document.getElementById('p-email').innerText = user.email;
+                });
+            } else {
+                document.getElementById('auth-section').classList.remove('hidden');
+                document.getElementById('main-app').classList.add('hidden');
+            }
+        });
 
-        // Load Offers... (Functionality for filtering and listing)
+        function logout() { auth.signOut(); }
     </script>
 </body>
 </html>
