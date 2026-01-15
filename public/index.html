@@ -1,0 +1,45 @@
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        databaseURL: "YOUR_DB_URL",
+        projectId: "YOUR_PROJECT_ID",
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // অফার লোড করা
+    function loadOffers() {
+        db.ref('offers').on('value', (snapshot) => {
+            const data = snapshot.val();
+            let html = '';
+            for (let id in data) {
+                const offer = data[id];
+                html += `
+                <div class="card">
+                    <span class="op-tag tag-${offer.operator.toLowerCase()}">${offer.operator}</span>
+                    <div class="card-title">${offer.title}</div>
+                    <div class="validity">${offer.validity}</div>
+                    <button class="price-button" onclick="buyOffer('${id}', '${offer.title}', '${offer.price}')">৳ ${offer.price}</button>
+                </div>`;
+            }
+            document.querySelector('.offers-grid').innerHTML = html;
+        });
+    }
+
+    function buyOffer(id, title, price) {
+        const phone = prompt("আপনার নম্বরটি দিন:");
+        if(phone) {
+            fetch('/api/bot', {
+                method: 'POST',
+                body: JSON.stringify({ title, price, phone })
+            });
+            alert("অর্ডারটি গ্রহণ করা হয়েছে!");
+        }
+    }
+    // Initial call
+    loadOffers();
+</script>
