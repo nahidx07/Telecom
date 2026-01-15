@@ -1,33 +1,78 @@
 <!DOCTYPE html>
-<html>
+<html lang="bn">
 <head>
-    <title>Admin Panel</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Premium - BD Offer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { font-family: sans-serif; padding: 20px; display: flex; gap: 20px; }
-        .box { flex: 1; background: #eee; padding: 20px; border-radius: 10px; }
-        input, select, button { width: 100%; padding: 10px; margin: 10px 0; }
-        .req-item { background: white; padding: 10px; margin-bottom: 5px; border-radius: 5px; }
+        :root { --sidebar-bg: #1a2236; --main-bg: #f4f7fe; --active-color: #f1c40f; --text-color: #a0aec0; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { display: flex; background: var(--main-bg); height: 100vh; }
+
+        /* Sidebar */
+        .sidebar { width: 260px; background: var(--sidebar-bg); color: white; display: flex; flex-direction: column; padding: 20px; transition: 0.3s; }
+        .logo { font-size: 22px; font-weight: bold; color: white; display: flex; align-items: center; gap: 10px; margin-bottom: 40px; }
+        .logo i { color: var(--active-color); font-size: 28px; }
+        
+        .nav-item { display: flex; align-items: center; gap: 15px; padding: 12px 15px; border-radius: 10px; color: var(--text-color); cursor: pointer; transition: 0.3s; margin-bottom: 5px; text-decoration: none; }
+        .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.05); color: white; }
+        .nav-item.active i { color: var(--active-color); }
+
+        .logout-btn { margin-top: auto; background: #2d1a1a; color: #ff5e5e; padding: 12px; border-radius: 10px; text-align: center; cursor: pointer; border: 1px solid #4a1c1c; }
+
+        /* Main Content */
+        .content { flex: 1; padding: 30px; overflow-y: auto; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        input, select, button { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; }
+        .btn-save { background: var(--sidebar-bg); color: white; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="box">
-        <h3>Add Offer</h3>
-        <input type="text" id="off-title" placeholder="Offer Title">
-        <input type="number" id="off-price" placeholder="Price">
-        <select id="off-op"><option>GP</option><option>Robi</option><option>Airtel</option><option>Banglalink</option></select>
-        <select id="off-cat"><option>Internet</option><option>Minute</option><option>Bundle</option><option>SMS</option></select>
-        <button onclick="addOffer()">Add Offer</button>
-
-        <hr>
-        <h3>Settings</h3>
-        <input type="text" id="pay-num" placeholder="Admin Payment Number">
-        <button onclick="updateSettings()">Update Payment Number</button>
+    <div class="sidebar">
+        <div class="logo"><i class="fas fa-coins"></i> Premium Admin</div>
+        <nav>
+            <div class="nav-item active" onclick="showSection('dash')"><i class="fas fa-th-large"></i> Dashboard</div>
+            <div class="nav-item" onclick="showSection('members')"><i class="fas fa-users"></i> Members</div>
+            <div class="nav-item" onclick="showSection('orders')"><i class="fas fa-history"></i> Order History</div>
+            <div class="nav-item" onclick="showSection('offers')"><i class="fas fa-gift"></i> Manage Offers</div>
+            <div class="nav-item" onclick="showSection('broadcast')"><i class="fas fa-bullhorn"></i> Broadcast</div>
+            <div class="nav-item" onclick="showSection('settings')"><i class="fas fa-cog"></i> Settings</div>
+        </nav>
+        <div class="logout-btn"><i class="fas fa-power-off"></i> Logout</div>
     </div>
 
-    <div class="box">
-        <h3>Payment Requests</h3>
-        <div id="request-list"></div>
+    <div class="content">
+        <!-- Settings Section -->
+        <div id="settings" class="section">
+            <div class="card">
+                <h3>Payment Gateway Setup</h3>
+                <label>টাকা পাঠানোর নম্বর (Admin Number)</label>
+                <input type="text" id="admin-pay-num" placeholder="বিকাশ/নগদ নম্বর দিন">
+                <button class="btn-save" onclick="updatePaymentInfo()">Save Settings</button>
+            </div>
+        </div>
+
+        <!-- Order History Section -->
+        <div id="orders" class="section" style="display:none;">
+            <div class="card">
+                <h3>Order History (Withdraws & Purchases)</h3>
+                <div id="order-list">লোড হচ্ছে...</div>
+            </div>
+        </div>
+
+        <!-- Offers Management -->
+        <div id="offers" class="section" style="display:none;">
+            <div class="card">
+                <h3>Add New Offer</h3>
+                <input type="text" id="off-title" placeholder="Offer Title">
+                <input type="number" id="off-price" placeholder="Price">
+                <select id="off-op"><option>GP</option><option>Robi</option><option>Airtel</option><option>Banglalink</option><option>Teletalk</option></select>
+                <select id="off-cat"><option>Internet</option><option>Minute</option><option>Bundle</option><option>SMS</option></select>
+                <button class="btn-save" onclick="saveOffer()">Publish Offer</button>
+            </div>
+        </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
@@ -44,46 +89,25 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        function addOffer() {
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+            document.getElementById(id).style.display = 'block';
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+
+        function updatePaymentInfo() {
+            const num = document.getElementById('admin-pay-num').value;
+            db.ref('settings/adminNumber').set(num).then(() => alert('নম্বর আপডেট হয়েছে!'));
+        }
+
+        function saveOffer() {
             const title = document.getElementById('off-title').value;
             const price = document.getElementById('off-price').value;
-            const op = document.getElementById('off-op').value;
-            const cat = document.getElementById('off-cat').value;
-            db.ref('offers').push({ title, price, operator: op, category: cat });
-            alert("Added!");
-        }
-
-        function updateSettings() {
-            const num = document.getElementById('pay-num').value;
-            db.ref('settings/paymentNumber').set(num);
-            alert("Updated!");
-        }
-
-        // Load Payment Requests
-        db.ref('addMoneyRequests').on('value', snap => {
-            const list = document.getElementById('request-list');
-            list.innerHTML = "";
-            const data = snap.val();
-            for(let id in data) {
-                if(data[id].status === 'pending') {
-                    list.innerHTML += `
-                        <div class="req-item">
-                            <p>Sender: ${data[id].sender}</p>
-                            <p>TrxID: ${data[id].trxId}</p>
-                            <button onclick="approve('${id}', '${data[id].uid}')">Approve</button>
-                            <button onclick="reject('${id}')" style="background:red; color:white;">Reject</button>
-                        </div>
-                    `;
-                }
-            }
-        });
-
-        function approve(reqId, uid) {
-            const amount = prompt("কত টাকা এড করবেন?");
-            if(amount) {
-                db.ref('users/' + uid + '/balance').transaction(current => (current || 0) + parseFloat(amount));
-                db.ref('addMoneyRequests/' + reqId).update({ status: 'approved' });
-            }
+            const operator = document.getElementById('off-op').value;
+            const category = document.getElementById('off-cat').value;
+            db.ref('offers').push({ title, price, operator, category });
+            alert('অফার যুক্ত হয়েছে!');
         }
     </script>
 </body>
