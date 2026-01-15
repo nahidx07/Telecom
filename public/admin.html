@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin - Manage Offers</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f4f4f4; }
+        .form-box { background: white; padding: 20px; border-radius: 10px; max-width: 400px; margin-bottom: 20px; }
+        input, select, button { width: 100%; padding: 10px; margin: 5px 0; }
+        .offer-item { background: white; padding: 10px; margin: 5px 0; display: flex; justify-content: space-between; }
+    </style>
+</head>
+<body>
+    <h2>Add New Offer</h2>
+    <div class="form-box">
+        <input type="text" id="title" placeholder="Offer Title (e.g. 10GB 30Day)">
+        <input type="number" id="price" placeholder="Price">
+        <input type="text" id="validity" placeholder="Validity">
+        <select id="operator">
+            <option value="Robi">Robi</option>
+            <option value="GP">GP</option>
+            <option value="Banglalink">Banglalink</option>
+            <option value="Airtel">Airtel</option>
+            <option value="Teletalk">Teletalk</option>
+        </select>
+        <button onclick="addOffer()" style="background: green; color: white;">Add Offer</button>
+    </div>
+
+    <h2>Current Offers</h2>
+    <div id="admin-offer-list"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <script>
+        const firebaseConfig = { /* আপনার কনফিগ এখানে */ };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        function addOffer() {
+            const title = document.getElementById('title').value;
+            const price = document.getElementById('price').value;
+            const validity = document.getElementById('validity').value;
+            const operator = document.getElementById('operator').value;
+
+            db.ref('offers').push({ title, price, validity, operator });
+            alert("Added!");
+        }
+
+        db.ref('offers').on('value', (snapshot) => {
+            const data = snapshot.val();
+            let html = '';
+            for (let id in data) {
+                html += `<div class="offer-item">${data[id].title} - ${data[id].price}tk 
+                <button onclick="deleteOffer('${id}')" style="width:60px; background:red; color:white;">Delete</button></div>`;
+            }
+            document.getElementById('admin-offer-list').innerHTML = html;
+        });
+
+        function deleteOffer(id) { db.ref('offers/' + id).remove(); }
+    </script>
+</body>
+</html>
