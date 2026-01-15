@@ -2,81 +2,97 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Premium - BD Offer</title>
+    <title>Admin Panel - BD Offer</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --sidebar-bg: #1a2236; --main-bg: #f4f7fe; --active-color: #f1c40f; --text-color: #a0aec0; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { display: flex; background: var(--main-bg); height: 100vh; }
+        :root { --sidebar: #1a2236; --bg: #0f172a; --card: #1e293b; --yellow: #f1c40f; }
+        body { margin: 0; display: flex; height: 100vh; background: var(--bg); color: white; font-family: sans-serif; overflow: hidden; }
+        
+        /* Auth */
+        #admin-login { position: fixed; inset: 0; background: var(--bg); z-index: 5000; display: flex; align-items: center; justify-content: center; }
+        .login-box { background: var(--card); padding: 40px; border-radius: 15px; width: 320px; text-align: center; }
 
         /* Sidebar */
-        .sidebar { width: 260px; background: var(--sidebar-bg); color: white; display: flex; flex-direction: column; padding: 20px; transition: 0.3s; }
-        .logo { font-size: 22px; font-weight: bold; color: white; display: flex; align-items: center; gap: 10px; margin-bottom: 40px; }
-        .logo i { color: var(--active-color); font-size: 28px; }
-        
-        .nav-item { display: flex; align-items: center; gap: 15px; padding: 12px 15px; border-radius: 10px; color: var(--text-color); cursor: pointer; transition: 0.3s; margin-bottom: 5px; text-decoration: none; }
-        .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.05); color: white; }
-        .nav-item.active i { color: var(--active-color); }
+        .sidebar { width: 260px; background: var(--sidebar); display: flex; flex-direction: column; padding: 25px; transition: 0.3s; }
+        .sidebar.hidden { margin-left: -260px; }
+        .nav-item { padding: 12px 15px; color: #94a3b8; cursor: pointer; display: flex; align-items: center; gap: 12px; border-radius: 8px; margin-bottom: 5px; }
+        .nav-item.active { background: rgba(255,255,255,0.05); color: var(--yellow); border-left: 3px solid var(--yellow); }
 
-        .logout-btn { margin-top: auto; background: #2d1a1a; color: #ff5e5e; padding: 12px; border-radius: 10px; text-align: center; cursor: pointer; border: 1px solid #4a1c1c; }
+        /* Content */
+        .main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+        header { padding: 15px 30px; background: var(--sidebar); display: flex; justify-content: space-between; align-items: center; }
+        .content-body { padding: 30px; }
+        .card { background: var(--card); padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+        input, select, textarea { width: 100%; padding: 10px; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 6px; margin: 10px 0; }
+        button { cursor: pointer; border-radius: 6px; border: none; font-weight: bold; }
+        .btn-y { background: var(--yellow); color: black; padding: 10px 20px; }
 
-        /* Main Content */
-        .content { flex: 1; padding: 30px; overflow-y: auto; }
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        input, select, button { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; }
-        .btn-save { background: var(--sidebar-bg); color: white; font-weight: bold; cursor: pointer; }
+        .hidden-el { display: none; }
     </style>
 </head>
 <body>
 
-    <div class="sidebar">
-        <div class="logo"><i class="fas fa-coins"></i> Premium Admin</div>
-        <nav>
-            <div class="nav-item active" onclick="showSection('dash')"><i class="fas fa-th-large"></i> Dashboard</div>
-            <div class="nav-item" onclick="showSection('members')"><i class="fas fa-users"></i> Members</div>
-            <div class="nav-item" onclick="showSection('orders')"><i class="fas fa-history"></i> Order History</div>
-            <div class="nav-item" onclick="showSection('offers')"><i class="fas fa-gift"></i> Manage Offers</div>
-            <div class="nav-item" onclick="showSection('broadcast')"><i class="fas fa-bullhorn"></i> Broadcast</div>
-            <div class="nav-item" onclick="showSection('settings')"><i class="fas fa-cog"></i> Settings</div>
-        </nav>
-        <div class="logout-btn"><i class="fas fa-power-off"></i> Logout</div>
+    <div id="admin-login">
+        <div class="login-box">
+            <h2>Admin Login</h2>
+            <input type="email" id="a-email" placeholder="Email">
+            <input type="password" id="a-pass" placeholder="Password">
+            <button class="btn-y" onclick="adminLogin()">Login</button>
+        </div>
     </div>
 
-    <div class="content">
-        <!-- Settings Section -->
-        <div id="settings" class="section">
-            <div class="card">
-                <h3>Payment Gateway Setup</h3>
-                <label>টাকা পাঠানোর নম্বর (Admin Number)</label>
-                <input type="text" id="admin-pay-num" placeholder="বিকাশ/নগদ নম্বর দিন">
-                <button class="btn-save" onclick="updatePaymentInfo()">Save Settings</button>
-            </div>
-        </div>
+    <div class="sidebar" id="sidebar">
+        <h2 style="color:white;"><i class="fas fa-coins" style="color:var(--yellow);"></i> CoinMaster</h2><br>
+        <div class="nav-item active" onclick="show('dash', this)"><i class="fas fa-th-large"></i> Dashboard</div>
+        <div class="nav-item" onclick="show('members', this)"><i class="fas fa-users"></i> Members</div>
+        <div class="nav-item" onclick="show('offers', this)"><i class="fas fa-plus-circle"></i> Add Offer</div>
+        <div class="nav-item" onclick="show('payments', this)"><i class="fas fa-wallet"></i> Payments</div>
+        <div class="nav-item" style="margin-top:auto" onclick="location.reload()"><i class="fas fa-sign-out-alt"></i> Logout</div>
+    </div>
 
-        <!-- Order History Section -->
-        <div id="orders" class="section" style="display:none;">
-            <div class="card">
-                <h3>Order History (Withdraws & Purchases)</h3>
-                <div id="order-list">লোড হচ্ছে...</div>
-            </div>
-        </div>
+    <div class="main">
+        <header>
+            <i class="fas fa-bars" onclick="document.getElementById('sidebar').classList.toggle('hidden')"></i>
+            <span>Admin Premium</span>
+        </header>
 
-        <!-- Offers Management -->
-        <div id="offers" class="section" style="display:none;">
-            <div class="card">
-                <h3>Add New Offer</h3>
-                <input type="text" id="off-title" placeholder="Offer Title">
-                <input type="number" id="off-price" placeholder="Price">
-                <select id="off-op"><option>GP</option><option>Robi</option><option>Airtel</option><option>Banglalink</option><option>Teletalk</option></select>
-                <select id="off-cat"><option>Internet</option><option>Minute</option><option>Bundle</option><option>SMS</option></select>
-                <button class="btn-save" onclick="saveOffer()">Publish Offer</button>
+        <div class="content-body">
+            <div id="page-dash" class="page"><h1>Dashboard</h1></div>
+
+            <div id="page-members" class="page hidden-el">
+                <div class="card">
+                    <h3>Members Management</h3>
+                    <div id="user-list"></div>
+                </div>
+            </div>
+
+            <div id="page-offers" class="page hidden-el">
+                <div class="card">
+                    <h3>Add Offer</h3>
+                    <input type="text" id="o-title" placeholder="Title">
+                    <input type="number" id="o-price" placeholder="Price">
+                    <select id="o-op"><option>GP</option><option>Robi</option><option>Airtel</option><option>BL</option></select>
+                    <button class="btn-y" onclick="saveOffer()">Save Offer</button>
+                </div>
+            </div>
+
+            <div id="page-payments" class="page hidden-el">
+                <div class="card">
+                    <h3>Payment Methods</h3>
+                    <input type="text" id="p-bkash" placeholder="Bkash Number">
+                    <input type="text" id="p-nagad" placeholder="Nagad Number">
+                    <input type="text" id="p-rocket" placeholder="Rocket Number">
+                    <textarea id="p-inst" placeholder="Instruction text"></textarea>
+                    <button class="btn-y" onclick="savePayments()">Update Payments</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
     <script>
         const firebaseConfig = {
   apiKey: "AIzaSyCbYJQ9y9CJKiT5aJyrIA0pFRGy1uvZikA",
@@ -87,28 +103,48 @@
   appId: "1:1020351520674:web:c84659bc5ca2f6b41edcfb"
 };
         firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
         const db = firebase.database();
 
-        function showSection(id) {
-            document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
-            document.getElementById(id).style.display = 'block';
+        function adminLogin() {
+            auth.signInWithEmailAndPassword(document.getElementById('a-email').value, document.getElementById('a-pass').value)
+                .then(() => document.getElementById('admin-login').style.display='none')
+                .catch(e => alert(e.message));
+        }
+
+        function show(id, el) {
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden-el'));
+            document.getElementById('page-'+id).classList.remove('hidden-el');
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            event.currentTarget.classList.add('active');
+            el.classList.add('active');
         }
 
-        function updatePaymentInfo() {
-            const num = document.getElementById('admin-pay-num').value;
-            db.ref('settings/adminNumber').set(num).then(() => alert('নম্বর আপডেট হয়েছে!'));
+        function savePayments() {
+            db.ref('settings/payments').set({
+                bkash: document.getElementById('p-bkash').value,
+                nagad: document.getElementById('p-nagad').value,
+                rocket: document.getElementById('p-rocket').value,
+                instruction: document.getElementById('p-inst').value
+            }).then(() => alert('Saved!'));
         }
 
-        function saveOffer() {
-            const title = document.getElementById('off-title').value;
-            const price = document.getElementById('off-price').value;
-            const operator = document.getElementById('off-op').value;
-            const category = document.getElementById('off-cat').value;
-            db.ref('offers').push({ title, price, operator, category });
-            alert('অফার যুক্ত হয়েছে!');
-        }
+        db.ref('users').on('value', snap => {
+            const users = snap.val();
+            let html = '';
+            for(let id in users) {
+                html += `<div style="padding:10px; border-bottom:1px solid #334155; display:flex; justify-content:space-between;">
+                    <span>${users[id].name || 'User'} (৳${users[id].balance || 0})</span>
+                    <div>
+                        <button onclick="editBal('${id}', 100)">+100</button>
+                        <button onclick="editBal('${id}', -100)">-100</button>
+                        <button onclick="toggleBan('${id}', '${users[id].status}')">Ban</button>
+                    </div>
+                </div>`;
+            }
+            document.getElementById('user-list').innerHTML = html;
+        });
+
+        function editBal(uid, amt) { db.ref('users/'+uid+'/balance').transaction(c => (c||0)+amt); }
     </script>
 </body>
 </html>
